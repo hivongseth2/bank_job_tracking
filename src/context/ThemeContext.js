@@ -19,9 +19,12 @@ const darkColors = {
   info: '#64B5F6',
   white: '#FFFFFF',
   black: '#000000',
-};
+  chartColors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],};
 
 export const ThemeContext = createContext();
+
+
+
 
 export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);

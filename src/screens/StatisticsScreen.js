@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect ,useContext} from 'react';
+import { BarChart, PieChart } from 'react-native-chart-kit';
+import { SafeAreaView, ScrollView, View, Text, TouchableOpacity, StyleSheet,Dimensions } from 'react-native';
 import { globalStyles, colors } from '../styles';
 import { fetchTransactions } from '../services/api';
 import { formatCurrency, formatDate } from '../utils/formatters';
@@ -10,13 +11,19 @@ import Loading from '../components/common/Loading';
 import Button from '../components/common/Button';
 import ChipFilter from '../components/common/ChipFilter';
 import { Ionicons } from '@expo/vector-icons';
+import { ThemeContext } from '../context/ThemeContext';
+import {calculateExpenseByCategory, calculateSpendingTrend,calculateIncomeVsExpense} from '../utils/transaction'
 
 const StatisticsScreen = ({ navigation }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState('month'); // 'week', 'month', 'year'
-
+  const { colors } = useContext(ThemeContext);
+  const expenseByCategory = calculateExpenseByCategory(transactions);
+  const incomeVsExpense = calculateIncomeVsExpense(transactions);
+  const screenWidth = Dimensions.get('window').width;
+  
   const loadData = async () => {
     try {
       setLoading(true);
@@ -138,11 +145,10 @@ const StatisticsScreen = ({ navigation }) => {
     .reduce((sum, t) => sum + parseFloat(formatCurrency(t.số_tiền)), 0);
 
   const balance = income + expense;
-
   return (
-    <SafeAreaView style={globalStyles.container}>
-      <View style={globalStyles.glassHeader}>
-        <Text style={globalStyles.title}>Thống kê tài chính</Text>
+<ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+<View style={styles.header}>
+<Text style={[styles.title, { color: colors.text }]}>Chi tiêu theo danh mục</Text>
         <ChipFilter
           options={['week', 'month', 'year']}
           selectedOption={timeRange}
@@ -152,18 +158,45 @@ const StatisticsScreen = ({ navigation }) => {
           scrollable={false}
         />
       </View>
-
+  
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <BalanceChart data={chartData} />
-        
-        <SummaryCard 
-          income={income} 
-          expense={Math.abs(expense)} 
-          balance={balance} 
-        />
-        
-        <BankSummary banks={bankSummaryData} />
-        
+
+      {/* <PieChart
+          data={expenseByCategory}
+          width={screenWidth - 32}
+          height={220}
+          chartConfig={{
+            color: (opacity = 1) => colors.text,
+          }}
+          accessor="amount"
+          backgroundColor="transparent"
+          paddingLeft="15"
+        /> */}
+        <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>Thu nhập vs Chi tiêu</Text>
+        {/* <BarChart
+          data={incomeVsExpense}
+          width={screenWidth - 32}
+          height={220}
+          yAxisLabel="đ"
+          chartConfig={{
+            backgroundColor: colors.background,
+            backgroundGradientFrom: colors.background,
+            backgroundGradientTo: colors.background,
+            decimalPlaces: 0,
+            color: (opacity = 1) => colors.primary,
+            labelColor: (opacity = 1) => colors.text,
+          }}
+        /> */}
+      </View>
+      <BalanceChart transactions={filteredTransactions} />        
+          <SummaryCard 
+        income={income} 
+        expense={Math.abs(expense)} 
+        balance={balance} 
+      />
+      
+      <BankSummary transactions={filteredTransactions} />
         <TouchableOpacity 
           style={styles.analyticsButton}
           onPress={() => navigation.navigate('Analytics')}
@@ -172,7 +205,7 @@ const StatisticsScreen = ({ navigation }) => {
           <Text style={styles.analyticsButtonText}>Xem phân tích chi tiết</Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </ScrollView>
   );
 };
 
@@ -192,6 +225,19 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 16,
     fontWeight: '600',
+  },
+
+  container: {
+    flex: 1,
+  },
+  header: {
+    padding: 16,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });
 

@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../styles';
+import { ThemeContext } from '../../context/ThemeContext';
 import Card from '../common/Card';
 import { formatCurrency, formatTimeAgo } from '../../utils/formatters';
 
 const TransactionItem = ({ transaction, onPress }) => {
+  const { colors } = useContext(ThemeContext);
   const amount = parseFloat(formatCurrency(transaction.số_tiền));
   const isPositive = amount >= 0;
   
@@ -32,7 +33,7 @@ const TransactionItem = ({ transaction, onPress }) => {
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <Card style={styles.container}>
+      <Card style={[styles.container, { backgroundColor: colors.card }]}> 
         <View style={styles.row}>
           <View style={[styles.iconContainer, { backgroundColor: getIconBackground() }]}>
             <Ionicons name={getIconName()} size={24} color={getIconColor()} />
@@ -40,13 +41,13 @@ const TransactionItem = ({ transaction, onPress }) => {
           
           <View style={styles.contentContainer}>
             <View style={styles.topRow}>
-              <Text style={styles.description} numberOfLines={1}>
+              <Text style={[styles.description, { color: colors.text }]} numberOfLines={1}>
                 {transaction.mô_tả}
               </Text>
               <Text 
                 style={[
                   styles.amount, 
-                  isPositive ? styles.positiveAmount : styles.negativeAmount
+                  { color: isPositive ? colors.success : colors.danger }
                 ]}
               >
                 {isPositive ? '+' : ''}{amount.toLocaleString('vi-VN')} đ
@@ -55,10 +56,10 @@ const TransactionItem = ({ transaction, onPress }) => {
             
             <View style={styles.bottomRow}>
               <View style={styles.detailsContainer}>
-                <Text style={styles.bank}>{transaction.nguồn_tiền}</Text>
-                <Text style={styles.date}>{formatTimeAgo(transaction.ngày_giao_dịch)}</Text>
+                <Text style={[styles.bank, { color: colors.primary }]}>{transaction.nguồn_tiền}</Text>
+                <Text style={[styles.date, { color: colors.textSecondary }]}>{formatTimeAgo(transaction.ngày_giao_dịch)}</Text>
               </View>
-              <Text style={styles.balance}>
+              <Text style={[styles.balance, { color: colors.textSecondary }]}>
                 Số dư: {parseFloat(formatCurrency(transaction.số_dư)).toLocaleString('vi-VN')} đ
               </Text>
             </View>
@@ -104,7 +105,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     fontWeight: '500',
-    color: colors.text,
     flex: 1,
     marginRight: 8,
   },
@@ -112,29 +112,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  positiveAmount: {
-    color: colors.success,
-  },
-  negativeAmount: {
-    color: colors.danger,
-  },
   detailsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   bank: {
     fontSize: 14,
-    color: colors.primary,
     fontWeight: '500',
     marginRight: 8,
   },
   date: {
     fontSize: 12,
-    color: colors.textSecondary,
   },
   balance: {
     fontSize: 12,
-    color: colors.textSecondary,
   },
 });
 

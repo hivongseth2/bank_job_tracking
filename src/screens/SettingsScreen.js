@@ -16,9 +16,9 @@ import { ThemeContext } from '../context/ThemeContext';
 import { globalStyles } from '../styles';
 import SettingsSection from '../components/settings/SettingsSection';
 import SettingsItem from '../components/settings/SettingsItem';
-
+// import { Switch } from '@rneui/themed';
 const SettingsScreen = ({ navigation }) => {
-  const { colors, theme, setTheme } = useContext(ThemeContext);
+  const { colors, theme, toggleTheme} = useContext(ThemeContext);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [biometricsEnabled, setBiometricsEnabled] = useState(false);
@@ -31,8 +31,8 @@ const SettingsScreen = ({ navigation }) => {
   const handleThemeChange = (value) => {
     const newTheme = value ? 'dark' : 'light';
     setIsDarkMode(value);
-    setTheme(newTheme);
-    AsyncStorage.setItem('theme', newTheme);
+    toggleTheme()
+    // AsyncStorage.setItem('theme', newTheme);
   };
   
   const handleNotificationsChange = (value) => {
@@ -162,18 +162,18 @@ const SettingsScreen = ({ navigation }) => {
         
         {/* Cài đặt chung */}
         <SettingsSection title="Cài đặt chung">
-          <SettingsItem
-            icon="moon-outline"
-            title="Chế độ tối"
-            control={
-              <Switch
-                value={isDarkMode}
-                onValueChange={handleThemeChange}
-                trackColor={{ false: `${colors.textSecondary}50`, true: `${colors.primary}50` }}
-                thumbColor={isDarkMode ? colors.primary : colors.textSecondary}
-              />
-            }
+        <SettingsItem
+        icon="moon-outline"
+        title="Chế độ tối"
+        control={
+          <Switch
+            value={isDarkMode}
+            onValueChange={toggleTheme}
+            trackColor={{ false: colors.textSecondary, true: colors.primary }}
+            thumbColor={isDarkMode ? colors.primary : colors.white}
           />
+        }
+      />
           <SettingsItem
             icon="notifications-outline"
             title="Thông báo"

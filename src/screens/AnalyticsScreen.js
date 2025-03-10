@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { 
   SafeAreaView, 
   ScrollView, 
@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native';
+import { PieChart, LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
-import { PieChart } from 'react-native-chart-kit';
 import { globalStyles, colors } from '../styles';
 import { fetchTransactions } from '../services/api';
 import { formatCurrency } from '../utils/formatters';
@@ -17,16 +17,21 @@ import Card from '../components/common/Card';
 import ChipFilter from '../components/common/ChipFilter';
 import Loading from '../components/common/Loading';
 import Button from '../components/common/Button';
-
+import { ThemeContext } from '../context/ThemeContext';
+import {calculateExpenseByCategory, calculateSpendingTrend,calculateIncomeVsExpense} from '../utils/transaction'
 const screenWidth = Dimensions.get('window').width;
 
 const AnalyticsScreen = ({ navigation }) => {
+
+
+  const { colors } = useContext(ThemeContext);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState('month');
   const [chartType, setChartType] = useState('category'); // 'category', 'bank'
-  
+  const expenseByCategory = calculateExpenseByCategory(transactions);
+  const spendingTrend = calculateSpendingTrend(transactions);
   const loadData = async () => {
     try {
       setLoading(true);
@@ -42,7 +47,7 @@ const AnalyticsScreen = ({ navigation }) => {
   useEffect(() => {
     loadData();
   }, []);
-  
+
   const filterTransactionsByTimeRange = (transactions, range) => {
     const now = new Date();
     let startDate;
@@ -143,7 +148,7 @@ const AnalyticsScreen = ({ navigation }) => {
       legendFontSize: 12,
     }));
   };
-  
+
   const getTopExpenses = () => {
     if (!transactions.length) return [];
     
@@ -208,6 +213,43 @@ const AnalyticsScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={globalStyles.container}>
+
+<ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Chi tiêu theo danh mục</Text>
+        <PieChart
+          data={expenseByCategory}
+          width={screenWidth - 32}
+          height={220}
+          chartConfig={{
+            color: (opacity = 1) => colors.text,
+          }}
+          accessor="amount"
+          backgroundColor="transparent"
+          paddingLeft="15"
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Xu hướng chi tiêu</Text>
+        {/* <LineChart
+          data={spendingTrend}
+          width={screenWidth - 32}
+          height={220}
+          chartConfig={{
+            backgroundColor: colors.background,
+            backgroundGradientFrom: colors.background,
+            backgroundGradientTo: colors.background,
+            decimalPlaces: 0,
+            color: (opacity = 1) => colors.primary,
+            labelColor: (opacity = 1) => colors.text,
+          }}
+          bezier
+        /> */}
+      </View>
+
+      {/* Thêm các phân tích khác ở đây */}
+    </ScrollView>
       <View style={globalStyles.glassHeader}>
         <View style={styles.headerRow}>
           <TouchableOpacity 
@@ -488,6 +530,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.danger,
+  },
+  container: {
+    flex: 1,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
 });
 

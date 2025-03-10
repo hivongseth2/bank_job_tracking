@@ -1,74 +1,84 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { colors } from '../../styles';
-import Card from '../common/Card';
+import { ThemeContext } from '../../context/ThemeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
 const BalanceChart = ({ 
-  data, 
+  transactions, 
   title = 'Biểu đồ số dư', 
   height = 220,
   width = screenWidth - 32,
-  withCard = true,
   noDataMessage = 'Không đủ dữ liệu để hiển thị biểu đồ'
 }) => {
+  const { colors } = useContext(ThemeContext);
+
+  const prepareChartData = () => {
+    if (!transactions || transactions.length < 2) return null;
+
+    const sortedTransactions = [...transactions].sort((a, b) => {
+      return new Date(a.ngày_giao_dịch.split('/').reverse().join('-')) - new Date(b.ngày_giao_dịch.split('/').reverse().join('-'));
+    });
+
+    const recentTransactions = sortedTransactions.slice(-6);
+    const labels = recentTransactions.map(t => t.ngày_giao_dịch.split('/')[0]);
+    const balances = recentTransactions.map(t => parseFloat(t.số_dư.replace(/[^\d.-]/g, '')));
+
+    return {
+      labels,
+      datasets: [{ data: balances }]
+    };
+  };
+
+  const chartData = prepareChartData();
+
   const chartConfig = {
-    backgroundColor: colors.white,
-    backgroundGradientFrom: colors.white,
-    backgroundGradientTo: colors.white,
+    backgroundColor: colors.background,
+    backgroundGradientFrom: colors.background,
+    backgroundGradientTo: colors.background,
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    color: (opacity = 1) => `rgba(${colors.primary}, ${opacity})`,
+    labelColor: (opacity = 1) => colors.text,
     style: {
       borderRadius: 16,
     },
     propsForDots: {
       r: '6',
       strokeWidth: '2',
-      stroke: '#ffa726',
+      stroke: colors.primary,
     },
   };
 
-  const renderChart = () => {
-    if (!data || !data.labels || data.labels.length === 0) {
-      return (
-        <View style={styles.noDataContainer}>
-          <Text style={styles.noDataText}>{noDataMessage}</Text>
-        </View>
-      );
-    }
-
+  if (!chartData) {
     return (
-      <LineChart
-        data={data}
-        width={width}
-        height={height}
-        chartConfig={chartConfig}
-        bezier
-        style={styles.chart}
-      />
-    );
-  };
-
-  if (withCard) {
-    return (
-      <Card>
-        <Text style={styles.title}>{title}</Text>
-        {renderChart()}
-      </Card>
+      <View style={[styles.noDataContainer, { backgroundColor: `${colors.text}10` }]}>
+        <Text style={[styles.noDataText, { color: colors.textSecondary }]}>{noDataMessage}</Text>
+      </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      {renderChart()}
+      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+      <LineChart
+        data={chartData}
+        width={width}
+        height={height}
+        chartConfig={chartConfig}
+        bezier
+        style={styles.chart}
+        withInnerLines={false}
+        withOuterLines={false}
+        withVerticalLabels={true}
+        withHorizontalLabels={true}
+        fromZero={true}
+        yAxisLabel=""
+        yAxisSuffix=""
+      />
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     marginVertical: 10,
@@ -78,7 +88,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 15,
     textAlign: 'center',
-    color: colors.text,
   },
   chart: {
     marginVertical: 8,
@@ -88,12 +97,10 @@ const styles = StyleSheet.create({
     height: 220,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.02)',
     borderRadius: 16,
   },
   noDataText: {
     fontSize: 16,
-    color: colors.textSecondary,
   },
 });
 

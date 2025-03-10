@@ -1,46 +1,60 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { ThemeContext } from '../../context/ThemeContext';
 import ChipFilter from '../common/ChipFilter';
-import { colors } from '../../styles';
 
-const BankFilter = ({ banks, selectedBank, onSelectBank }) => {
+const BankFilter = ({ banks, selectedBank, onBankSelect }) => {
+  const { colors } = useContext(ThemeContext);
+  
+  // Đảm bảo luôn có option "All"
+  const allBanks = ['All', ...new Set(banks.filter(bank => bank !== 'All'))];
+
+  console.log('allBanks', allBanks);
+  
+  
   return (
     <View style={styles.container}>
-      <ChipFilter
-        options={banks}
-        selectedOption={selectedBank}
-        onSelect={onSelectBank}
-        containerStyle={styles.filterContainer}
-        chipStyle={styles.chip}
-        selectedChipStyle={styles.selectedChip}
-      />
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+
+          <ChipFilter
+
+          options={banks}
+          selectedOption={selectedBank}
+          onSelect={onBankSelect}
+          containerStyle={{ paddingHorizontal: 0, paddingVertical: 8 }}
+          textStyle={{ textTransform: 'capitalize' }}
+      
+          />
+
+        {/* {allBanks.map((bank) => (
+          <ChipFilter
+
+          options={['week', 'month', 'year']}
+
+            key={bank}
+            label={bank === 'All' ? 'Tất cả' : bank}
+            selected={selectedBank === bank}
+            onPress={() => onBankSelect(bank)}
+          />
+        ))} */}
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.card,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    zIndex: 10,
+    marginBottom: 8,
   },
-  filterContainer: {
-    paddingVertical: 10,
-  },
-  chip: {
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+  scrollContent: {
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
-  selectedChip: {
-    backgroundColor: colors.primary,
-  },
+ 
 });
 
 export default BankFilter;

@@ -17,6 +17,10 @@ const TransactionList = ({
 }) => {
   const { colors } = useContext(ThemeContext);
 
+
+  console.log(banks);
+  
+
   if (!transactions || transactions.length === 0) {
     return (
       <EmptyState 

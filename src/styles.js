@@ -29,6 +29,8 @@ export const colors = {
   glassDark: 'rgba(30, 30, 30, 0.7)',
   glassBorder: 'rgba(255, 255, 255, 0.2)',
   glassShadow: 'rgba(0, 0, 0, 0.05)',
+
+  chartColors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
 };
 
 export const globalStyles = StyleSheet.create({
@@ -247,4 +249,6 @@ export const globalStyles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+
+
 });

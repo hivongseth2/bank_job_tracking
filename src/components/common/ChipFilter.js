@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { colors } from '../../styles';
+import { ThemeContext } from '../../context/ThemeContext';
 
 const ChipFilter = ({ 
   options, 
@@ -13,13 +13,16 @@ const ChipFilter = ({
   selectedTextStyle,
   scrollable = true
 }) => {
+  const { colors } = useContext(ThemeContext);
+
   const renderChips = () => {
-    return options.map((option, index) => (
+    return options?.map((option, index) => (
       <TouchableOpacity
         key={index}
         style={[
           styles.chip,
-          selectedOption === option && styles.chipSelected,
+          { backgroundColor: colors.glass },
+          selectedOption === option && { backgroundColor: colors.primary },
           chipStyle,
           selectedOption === option && selectedChipStyle,
         ]}
@@ -28,7 +31,8 @@ const ChipFilter = ({
         <Text
           style={[
             styles.chipText,
-            selectedOption === option && styles.chipTextSelected,
+            { color: colors.text },
+            selectedOption === option && { color: colors.white },
             textStyle,
             selectedOption === option && selectedTextStyle,
           ]}
@@ -73,20 +77,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
     marginRight: 8,
     marginBottom: 8,
   },
-  chipSelected: {
-    backgroundColor: colors.primary,
-  },
   chipText: {
     fontSize: 14,
-    color: colors.text,
-  },
-  chipTextSelected: {
-    color: colors.white,
-    fontWeight: '500',
   },
 });
 

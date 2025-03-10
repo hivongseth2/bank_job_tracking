@@ -1,97 +1,82 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { colors } from '../../styles';
-import Card from '../common/Card';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { PieChart } from 'react-native-chart-kit';
+import { ThemeContext } from '../../context/ThemeContext';
 
-const BankSummary = ({ banks, title = 'Số dư theo ngân hàng' }) => {
-  const renderBankItem = ({ item }) => {
-    return (
-      <View style={styles.bankItem}>
-        <Text style={styles.bankName}>{item.name}</Text>
-        <Text style={styles.bankBalance}>
-          {item.balance.toLocaleString('vi-VN')} đ
-        </Text>
-      </View>
-    );
+const screenWidth = Dimensions.get('window').width;
+
+const BankSummary = ({ transactions }) => {
+  const { colors } = useContext(ThemeContext);
+  const defaultColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+  const prepareBankData = () => {
+    if (!transactions || transactions.length === 0) return null;
+  
+    const bankMap = {};
+    transactions.forEach(transaction => {
+      const bank = transaction.nguồn_tiền;
+      if (!bankMap[bank]) {
+        bankMap[bank] = 0;
+      }
+      bankMap[bank] += parseFloat(transaction.số_tiền.replace(/[^\d.-]/g, ''));
+    });
+  
+    return Object.entries(bankMap).map(([name, balance], index) => ({
+      name,
+      balance: Math.abs(balance),
+      color: (colors.chartColors && colors.chartColors[index % colors.chartColors.length]) || defaultColors[index % defaultColors.length],
+      legendFontColor: colors.text,
+      legendFontSize: 12,
+    }));
   };
 
+  const chartData = prepareBankData();
+
+  if (!chartData) {
+    return (
+      <View style={[styles.noDataContainer, { backgroundColor: `${colors.text}10` }]}>
+        <Text style={[styles.noDataText, { color: colors.textSecondary }]}>Không có dữ liệu ngân hàng</Text>
+      </View>
+    );
+  }
+
   return (
-    <Card>
-      <Text style={styles.title}>{title}</Text>
-      
-      <FlatList
-        data={banks}
-        renderItem={renderBankItem}
-        keyExtractor={(item) => item.name}
-        scrollEnabled={false}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Không có dữ liệu ngân hàng</Text>
-          </View>
-        }
+    <View style={styles.container}>
+      <Text style={[styles.title, { color: colors.text }]}>Tổng quan theo ngân hàng</Text>
+      <PieChart
+        data={chartData}
+        width={screenWidth - 32}
+        height={220}
+        chartConfig={{
+          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          labelColor: (opacity = 1) => colors.text,
+        }}
+        accessor="balance"
+        backgroundColor="transparent"
+        paddingLeft="15"
+        absolute
       />
-      
-      {banks?.length > 0 && (
-        <View style={styles.totalContainer}>
-          <Text style={styles.totalLabel}>Tổng số dư</Text>
-          <Text style={styles.totalValue}>
-            {banks.reduce((sum, bank) => sum + bank.balance, 0).toLocaleString('vi-VN')} đ
-          </Text>
-        </View>
-      )}
-    </Card>
+    </View>
   );
 };
-
 const styles = StyleSheet.create({
+  container: {
+    marginVertical: 10,
+    alignItems: 'center',
+  },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
-    color: colors.text,
+    textAlign: 'center',
   },
-  bankItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  bankName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.text,
-  },
-  bankBalance: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  emptyContainer: {
-    padding: 20,
+  noDataContainer: {
+    height: 220,
+    justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 16,
   },
-  emptyText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  totalContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: 16,
-    marginTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  totalLabel: {
+  noDataText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  totalValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.primary,
   },
 });
 
