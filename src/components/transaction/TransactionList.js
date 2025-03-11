@@ -18,7 +18,6 @@ const TransactionList = ({
   const { colors } = useContext(ThemeContext);
 
 
-  console.log(banks);
   
 
   if (!transactions || transactions.length === 0) {
@@ -32,7 +31,8 @@ const TransactionList = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{    backgroundColor:colors.glasst
+    }]}>
       {showFilter && (
         <BankFilter 
           banks={banks} 
@@ -60,6 +60,7 @@ const TransactionList = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding:3,
   },
   listContent: {
     paddingBottom: 8,

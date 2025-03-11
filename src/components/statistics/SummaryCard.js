@@ -4,13 +4,16 @@ import { colors } from '../../styles';
 import Card from '../common/Card';
 
 const SummaryCard = ({ income, expense, balance }) => {
+
+
+  
   return (
     <Card>
       <View style={styles.row}>
         <View style={styles.summaryItem}>
           <Text style={styles.summaryLabel}>Tổng thu</Text>
           <Text style={[styles.summaryValue, styles.positiveAmount]}>
-            {income?.toLocaleString('vi-VN')} đ
+            {income?.toLocaleString('vi-VN')} 
           </Text>
         </View>
         
@@ -19,7 +22,7 @@ const SummaryCard = ({ income, expense, balance }) => {
         <View style={styles.summaryItem}>
           <Text style={styles.summaryLabel}>Tổng chi</Text>
           <Text style={[styles.summaryValue, styles.negativeAmount]}>
-            {expense?.toLocaleString('vi-VN')} đ
+            {expense?.toLocaleString('vi-VN')} 
           </Text>
         </View>
         
@@ -31,7 +34,7 @@ const SummaryCard = ({ income, expense, balance }) => {
             styles.summaryValue, 
             balance >= 0 ? styles.positiveAmount : styles.negativeAmount
           ]}>
-            {balance?.toLocaleString('vi-VN')} đ
+            {balance?.toLocaleString('vi-VN')}
           </Text>
         </View>
       </View>

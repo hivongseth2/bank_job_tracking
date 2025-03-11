@@ -9,7 +9,7 @@ const Card = ({ children, style }) => {
     <View style={[
       styles.card, 
       { 
-        backgroundColor: colors.glass,
+        backgroundColor: colors.card,
         borderColor: colors.glassBorder,
       },
       style
@@ -26,13 +26,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+  
+
   },
 });
 

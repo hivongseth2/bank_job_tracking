@@ -13,7 +13,7 @@ export const colors = {
   black: '#000000',
   transparent: 'transparent',
   background: '#F2F2F7',
-  card: 'rgba(255, 255, 255, 0.8)',
+  card: 'rgb(235, 239, 243)',
   cardDark: 'rgba(30, 30, 30, 0.8)',
   text: '#1C1C1E',
   textSecondary: '#8E8E93',
@@ -25,9 +25,9 @@ export const colors = {
   gradientEnd: '#5856D6',
   
   // Glassmorphism
-  glass: 'rgba(255, 255, 255, 0.7)',
+  glass: 'rgba(239, 244, 248, 0.91)',
   glassDark: 'rgba(30, 30, 30, 0.7)',
-  glassBorder: 'rgba(255, 255, 255, 0.2)',
+  glassBorder: 'rgba(255, 255, 255, 0.94)',
   glassShadow: 'rgba(0, 0, 0, 0.05)',
 
   chartColors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
